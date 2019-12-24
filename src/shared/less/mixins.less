@@ -1,0 +1,41 @@
+
+.box-shadow() {
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;  /* Firefox 3.5 - 3.6 */
+    box-shadow:         3px 3px 5px 6px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+}
+
+
+
+//top-shadow with depth input(1~5)
+.shadow__top(@depth) {
+
+    @horizontal__offset: (1.5, 3, 10, 14, 19);
+    @vertical__offset: (1.5, 3, 10, 14, 19);
+    @blur__radius: (1.5, 3, 10, 14, 19);
+    @spread__radius: (1.5, 3, 10, 14, 19); //optional
+    @color__visibility: (.12 .16 .19 .25 .30);
+
+    @primary-offset: extract(@vertical__offset, @depth) * 1px;
+    @blur: extract(@blur__radius, @depth) * 4px;
+    @color: rgba(black, extract(@color__visibility, @depth));
+
+    @return: 0 @primary-offset @blur @color;
+}
+
+//btm-shadow with depth input(1~5)
+.shadow__bottom(@depth) {
+
+    @horizontal__offset: 0;
+    @vertical__offset: (1.5, 3, 6, 10, 15);
+    @blur__radius: (1, 3, 3, 5, 6);
+    @spread__radius: (1.5, 3, 10, 14, 19); //optional
+    @color__visibility: (.24 .23 .23 .22 .22);
+
+    @primary-offset: extract(@vertical__offset , @depth) * 1px;
+    @blur: extract(@blur__radius, @depth) * 4px;
+    @color: rgba(black, extract(@color__visibility, @depth));
+  
+    @return: 0 @primary-offset @blur @color;
+}
+  

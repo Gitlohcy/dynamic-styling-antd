@@ -1,10 +1,10 @@
 import React from 'react';
 import { Form, Select, InputNumber, DatePicker, Switch, Slider, Button } from 'antd';
-import './App.css';
+import './index.css';
 
 const { Option } = Select;
 
-const App = () => (
+const FormDemo = () => (
   <>
     <section style={{textAlign: 'center'}}>
       <h1 style={{textAlign: 'center'}}>Ant Design</h1>
@@ -68,4 +68,4 @@ const App = () => (
   </>
 );
 
-export default App;
+export default FormDemo;
