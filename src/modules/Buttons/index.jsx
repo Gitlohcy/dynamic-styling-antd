@@ -12,22 +12,14 @@ import DropdownMenu from "@/components/DropdownMenu"
 
 
 const Buttons = () => {
-    const [btnState, setBtnState] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [tableData, setTableData] = useState([]);
-    const [change, setChange] = useState({ index: 0});
+    const [tableData, setTableData] = useState(initTableData(properties));
+    const [change, setChange] = useState({ key: null});
 
     const prevData = useRef(tableData);
 
+    console.log('rerender Btn module');
     
-    console.log('rerender btn module');
-    
-
-    useEffect(() => {
-
-        initButtonState(properties,setBtnState)
-
-    }, [properties])
 
     useEffect(() => {
 
@@ -37,46 +29,23 @@ const Buttons = () => {
         const colSettings = [...mainComponent, ...PropArr]
         setColumns(colSettings)
 
-    }, [btnState, properties])
+    }, [properties])
 
-    
 
     useEffect(() => {
-        
-        //return a new Array with {key:index , type } + { possible settings}
-        function getSelectedItems(selectedItem){
-            
-            const cleanedItems = removeEmpty(selectedItem);
 
-            return properties.type.map((type, currentIndex) => {
-
-                const primaryData = {
-                    key: currentIndex,
-                    type
-                }
-
-                if(cleanedItems.index === currentIndex)
-                    return Object.assign(primaryData, cleanedItems)
-
-                return primaryData 
-            })
-        }
-        const selectedItem = { index: 0, size: "large" , shape: "circle"}
-
-        
+        //if "ommited" is set in properties , used with mergePreSetting
+        const verifySetting = chainChecking(omitDefault,removeEmpty)
 
         setTableData(
-            getSelectedItems(change)
+            getSelectedItems(change, prevData)
+            // mergePreSetting(prevData,change,tableData,verifySetting)
         )
         
     }, [change])
 
     useEffect(() => {
-        
-        console.log('preudate',prevData.current);
         prevData.current = tableData
-        console.log('after update',prevData.current);
-        
     }, [tableData])
 
     return (
@@ -89,22 +58,13 @@ const Buttons = () => {
 
 };
 
+
 //functions in useEffect
-const initButtonState = (properties,setBtnState) => {
-
-    setBtnState([]);
-
-    properties.type.map( type => {
-        setBtnState( stat =>  
-            [  ...stat,
-                {
-                    type, 
-                    shape:null,
-                    size:null
-                }
-            ])
-    })
-    
+const initTableData = (properties) => {
+    return properties.type.map( (type,index) => ({
+        key: index,
+        type
+    }))
 }
 
 const mapComponent = () => [{
@@ -116,7 +76,6 @@ const mapComponent = () => [{
 }]
 
 const mapProperties = (properties, setChange) => {
-    
     
     return Object.keys(properties).map( (key, index) => {
         if(key == "type")
@@ -137,6 +96,62 @@ const mapProperties = (properties, setChange) => {
                         setChange={setChange} 
                     />
             }
+    })
+}
+
+const omitDefault = obj => {
+    const newObj = {};
+
+    for (let [key, value] of Object.entries(obj)) {
+        if (obj[key] && typeof obj[key] === "object")
+            newObj[key] = removeEmpty(obj[key]); // recurse
+        else if(value !== "default" && value !== "omitted"){
+            newObj[key] = obj[key]
+        }
+    }
+
+    return newObj
+}
+
+const chainChecking = ( check1, check2) => {
+    return obj => check1(check2(obj)) 
+}
+
+function mergePreSetting(prevData,newSetting,tableData,verifySetting){
+            
+    const cleanedSetting = verifySetting(newSetting);
+
+    return prevData.current.length > 0 
+        ? (prevData.current.map( (value,index) => {
+                if(cleanedSetting.key === index)
+                    return Object.assign(value, cleanedSetting)
+
+                return value
+            })
+        )
+        : (tableData)
+
+}
+
+//return a new Array with {key:index , type } + ( { possible settings} && { prev setting }
+function getSelectedItems(selectedItem,prevData){
+            
+    const cleanedItems = removeEmpty(selectedItem);
+    
+    return properties.type.map((type, currentIndex) => {
+
+        const primaryData = {
+            key: currentIndex,
+            type
+        }
+
+        return (prevData.current.length > 0 )
+            ?(  
+                (cleanedItems.key === currentIndex)
+                    ? Object.assign(prevData.current[currentIndex], cleanedItems)
+                    : prevData.current[currentIndex]
+            ): primaryData
+
     })
 }
 

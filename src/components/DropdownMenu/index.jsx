@@ -10,7 +10,7 @@ export default (props) => {
 
         const itemInfo = {}
         itemInfo[title] = e.key;
-        itemInfo.index = index
+        itemInfo.key = index
 
         setCurrentItem(e.key);
         setChange(itemInfo);
